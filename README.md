@@ -4,12 +4,6 @@
 
 Heritage at Risk is an interactive GIS storytelling application that overlays America's historic places with federal flood, sea‑level‑rise, wildfire and coastal‑risk data, scores every landmark, and turns the results into plain‑language findings. Pick a state and you immediately see which historic places are threatened, how badly, and why.
 
-The app tells one story in three parts — **Past loss → Present conditions → Future risk**:
-
-1. **Lost America** — places already lost (demolished, burned, destroyed, submerged, relocated).
-2. **State Explorer / Interactive map** — places that still exist.
-3. **Findings** — places threatened by 2050 climate hazards.
-
 Built with **React + TypeScript**, the **ArcGIS Maps SDK for JavaScript**, and public **ArcGIS Living Atlas / federal ArcGIS REST services**.
 
 ---
@@ -26,8 +20,7 @@ Built with **React + TypeScript**, the **ArcGIS Maps SDK for JavaScript**, and p
 8. [User guide](#8-user-guide)
 9. [Data sources](#9-data-sources)
 10. [Future improvements](#10-future-improvements)
-11. [Lost America](#11-lost-america)
-12. [Final verification checklist](#final-verification-checklist)
+11. [Final verification checklist](#final-verification-checklist)
 
 Related documents: [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md) · [GIT_WORKFLOW.md](GIT_WORKFLOW.md)
 
@@ -65,8 +58,7 @@ Historic places are irreplaceable, yet most climate‑hazard planning focuses on
 | **Interactive map** | ArcGIS MapView with landmarks colored by risk class; toggleable FEMA flood, NOAA sea‑level‑rise, USFS wildfire and FEMA NRI coastal layers; search, legend, home button; filter by risk class or hazard; click a landmark for its evidence or a state to zoom. | `#/map` |
 | **State Explorer** | Choose a state from the dropdown or by clicking the map. See summary statistics, state findings, a ranked landmark list with expandable evidence, and a state map. **Run the live GIS analysis** on every National Historic Landmark (or every National Register listing) in that state. | `#/explore/XX` |
 | **Risk Analysis Engine** | Intersects each landmark point with every hazard layer, converts results to 0–3 severities, computes a 0–100 score, and assigns **Low / Moderate / High / Critical**. Detects multi‑hazard exposure and applies a community‑resilience adjustment. Runs in the browser and in Node. | `src/analysis/` |
-| **Findings Dashboard** | Stat tiles, auto‑generated findings, charts of threatened landmarks by state and by hazard, risk‑class distribution, multi‑hazard counts, and the Top 10 most vulnerable landmarks. A **Lost America** section adds total sites lost, removals from the National Register, oldest and most recently lost landmarks, and charts by state, decade and cause. Every chart has a table view. | `#/dashboard` |
-| **Lost America** | A clustered map of historic places that no longer exist, with search and state / decade / cause‑of‑loss filters, popups with archive sources and historic photos, a **Then vs Now** card (historic photo beside today's street map and satellite imagery), a storytelling panel, and a "What could be lost next?" bridge into the climate‑risk workflow. See [§11](#11-lost-america). | `#/lost` |
+| **Findings Dashboard** | Stat tiles, auto‑generated findings, charts of threatened landmarks by state and by hazard, risk‑class distribution, multi‑hazard counts, and the Top 10 most vulnerable landmarks. Every chart has a table view. | `#/dashboard` |
 | **Story Mode** | The home page tells the story: why heritage matters, why preservation matters, four ways climate reaches a landmark, what the analysis found, case files, recommendations, and future considerations. All numbers are live. | `#/` |
 | **About the Data / Project** | Datasets, service URLs, method, scoring tables, limitations; project purpose, goals and team. | `#/data`, `#/about` |
 | **Dark & light mode** | Toggle in the header; remembers the choice; follows the OS by default. Map basemap and widget theme switch too. | header |
@@ -116,18 +108,6 @@ flowchart LR
   CLI -- "writes" --> JSON["public/data/analysis-results.json"]
   JSON -- "loaded at startup" --> CTX
   REF["Reference set<br/>src/data/referenceLandmarks.ts"] --> CTX
-
-  subgraph Lost["Lost America"]
-    LP["LOST_PLACES<br/>src/data/lostPlaces.ts"]
-    LA["lostAnalysis.ts<br/>filter · summarize · narrate"]
-    LUI["LostAmericaPage<br/>LostMap · ThenNowCard · Story"]
-    LP --> LA --> LUI
-  end
-  LUI -- "clustered NRHP STATUS='Removed'" --> NRHP
-  LUI -- "lead image" --> WIKI["Wikipedia REST<br/>page summary"]
-  LUI -- "Then vs Now basemaps" --> IMG["Esri World Imagery<br/>+ World Street Map"]
-  LA --> DASH["Dashboard: Lost America section"]
-  LUI -- "What could be lost next?" --> CTX
 ```
 
 ### Data flow (ASCII)
@@ -175,13 +155,11 @@ Tech-Expo/
     │   ├── appConfig.ts       # Env vars (browser + Node), constants
     │   ├── layers.ts          # ★ All service URLs, hazard layer configs, field names
     │   ├── palette.ts         # Colors needed in JS (map renderers)
-    │   ├── lostCauses.ts      # Lost America: causes of loss, marker shapes, archive URLs
     │   └── states.ts          # 50 states + DC, coastal flag, fallback map views
     ├── types/
     │   ├── landmark.ts        # Landmark
     │   ├── hazard.ts          # HazardId, Severity, HazardExposure
-    │   ├── analysis.ts        # RiskAssessment, RiskClass, FindingsSummary, …
-    │   └── lost.ts            # LostPlace, LossCause, LostFilters, LostSummary
+    │   └── analysis.ts        # RiskAssessment, RiskClass, FindingsSummary, …
     ├── analysis/              # ★ Risk Analysis Engine (pure TypeScript, no UI)
     │   ├── arcgisRest.ts      # fetch wrappers: query, identify, paging, concurrency pool
     │   ├── geometry.ts        # point-in-polygon, bounding boxes, haversine
@@ -190,35 +168,26 @@ Tech-Expo/
     │   ├── riskScoring.ts     # Severity mappings, score, classification, reasons
     │   ├── riskEngine.ts      # Orchestration: assessLandmark / analyzeState
     │   ├── findings.ts        # Aggregation + auto-generated findings sentences
-    │   ├── lostAnalysis.ts    # Lost America: filters, dashboard metrics, narratives
-    │   ├── lostSource.ts      # Lost America: live count of NRHP "Removed" listings
-    │   ├── archiveImages.ts   # Lost America: historic photo lookup (Wikipedia lead image)
     │   └── __tests__/         # node:test unit tests (run with npm test)
     ├── data/
-    │   ├── referenceLandmarks.ts  # Curated, cited reference set (33 places)
-    │   └── lostPlaces.ts          # Lost America: 19 documented lost places
+    │   └── referenceLandmarks.ts  # Curated, cited reference set (33 places)
     ├── context/
     │   ├── AnalysisContext.tsx    # Dataset mode, live runs, summary (single source of truth)
     │   └── ThemeContext.tsx       # Light/dark mode
     ├── hooks/
-    │   ├── useHashRoute.ts    # Minimal hash router
-    │   └── useLostData.ts     # Lost America: archive image + removed-count hooks
+    │   └── useHashRoute.ts    # Minimal hash router
     ├── components/
     │   ├── layout/            # Header (nav, theme toggle), Footer
     │   ├── map/               # HeritageMap (ArcGIS), mapLayers (layer factory), LayerPanel
     │   ├── charts/            # ChartFrame, BarChart, SegmentedBar, StatTile
     │   ├── landmarks/         # LandmarkList (+ EvidenceTable), RiskBadge, HazardChips
     │   ├── findings/          # FindingsList
-    │   ├── lost/              # Lost America: LostMap, lostMapLayers, MiniMap, ThenNowCard,
-    │   │                      #   LostFilters, LostPlaceList, LostStoryPanel,
-    │   │                      #   WhatCouldBeLostNext, LostDashboardSection
-    │   └── common/            # StateSelect, DatasetBanner, ProgressBar, StoryArc
-    ├── pages/                 # HomePage (Story), LostAmericaPage, MapPage,
-    │                          # StateExplorerPage, DashboardPage, AboutDataPage, AboutProjectPage
+    │   └── common/            # StateSelect, DatasetBanner, ProgressBar
+    ├── pages/                 # HomePage (Story), MapPage, StateExplorerPage,
+    │                          # DashboardPage, AboutDataPage, AboutProjectPage
     └── styles/
         ├── global.css         # Design tokens (light/dark), base, header, buttons, fields
-        ├── components.css     # Component and page styles
-        └── lost.css           # Lost America styles
+        └── components.css     # Component and page styles
 ```
 
 ---
@@ -271,7 +240,6 @@ All are optional. Copy `.env.example` to `.env.local`:
 | `VITE_WHP_URL` | USFS WHP 2023 | Override the wildfire raster |
 | `VITE_SLR_BASE_URL` | NOAA `slr_{ft}ft` | Override the sea‑level services (`{ft}` is replaced) |
 | `VITE_ANALYSIS_CONCURRENCY` | `6` | Max parallel requests in the browser |
-| `VITE_WIKIPEDIA_SUMMARY_URL` | Wikipedia REST page summary | Lost America historic‑photo lookup (`{title}` is replaced) |
 
 The Node script reads the same variables from the shell environment.
 
@@ -405,12 +373,6 @@ Field names the engine reads (`FLD_ZONE`, `CFLD_RISKR`, `RESL_RATNG`, `RESNAME`,
 | *National Landmarks at Risk* (2014) | Union of Concerned Scientists | Reference‑set evidence |
 | NPS park climate pages and case studies (Fort Pulaski, Dry Tortugas) | National Park Service | Reference‑set evidence |
 | News and institutional reports (Vizcaya, Ellicott City, Sperry Chalet, Big Basin, Lahaina) | Cited per landmark in `referenceLandmarks.ts` | Reference‑set evidence |
-| National Register points with `STATUS = 'Removed'` | National Park Service | Lost America: clustered map layer + live count of removed listings |
-| Historic American Buildings Survey (HABS/HAER/HALS) | Library of Congress | Lost America: archive source links |
-| NRHP nomination files and photos | NPS NPGallery, National Archives catalog | Lost America: original nomination links |
-| Wikipedia page summaries (lead images from Wikimedia Commons) | Wikimedia Foundation | Lost America: "Then" historic photos, credited and linked |
-| World Imagery and World Street Map basemaps | Esri | Lost America: "Now" satellite and street views |
-| Lost‑place facts (Tullis‑Toledano Manor, Wo Hing Society Hall, Isle de Jean Charles, Sperry Chalet, Big Basin) | Cited per place in `lostPlaces.ts` | Lost America: dates and causes |
 
 ---
 
@@ -422,70 +384,6 @@ Field names the engine reads (`FLD_ZONE`, `CFLD_RISKR`, `RESL_RATNG`, `RESNAME`,
 - **Export options:** CSV/GeoJSON of results, printable PDF state reports, shareable map links with filters.
 - **Storm surge:** add NOAA SLOSH hurricane surge zones.
 - **Caching:** store live state results in IndexedDB between visits.
-
----
-
-## 11. Lost America
-
-> *"Every dot on this map represents a place that once existed and is now gone."*
-
-Lost America (`#/lost`) adds the **past** to the app's story. It reuses the existing design system, chart components, map pattern and analysis conventions, and ends by handing visitors to the climate‑risk workflow.
-
-### What it shows
-- **Clustered map** of lost places, styled by cause (color **and** marker shape): demolished ■, burned ▲, destroyed by disaster ◆, submerged ●, relocated ✚, removed/other ✖. Natural forces get hues (fire orange, water blue, storm aqua); human decisions get neutral grays.
-- **Optional NPS layer** of every National Register listing marked `Removed`, also clustered, with links to each original nomination file.
-- **Search** (place/address via the ArcGIS Search widget, and name/city text search), **state**, **decade lost** and **cause‑of‑loss** filters. The map, list, counts and dashboard all use the same filter function.
-- **Popups**: name, city, state, significance, year built, year lost, cause, what remains today, archive source, original nomination (when known), and a historic photo when one is available.
-- **Then vs Now**: the historic photo beside today's street map and today's satellite imagery of the exact site.
-- **Storytelling panel**: why these places mattered, what was lost, why preservation matters, and generated narratives such as *"Built in 1912, Wo Hing Society Hall stood for over a century before being destroyed by fire in 2023. Only the site remains…"*.
-- **"What could be lost next?"**: live counts from the climate‑risk analysis and links into the State Explorer, Findings and risk map.
-
-### Architecture
-
-```
-src/data/lostPlaces.ts ──► src/analysis/lostAnalysis.ts ──► pages/LostAmericaPage.tsx
-   (19 documented places)     filterLostPlaces()                ├─ components/lost/LostFilters
-                              summarizeLost()                   ├─ components/lost/LostMap ──► lostMapLayers.ts
-                              narrativeFor()                    │      ├─ clustered curated layer (+ popups)
-                                                                │      └─ clustered NPS "Removed" layer
-src/analysis/archiveImages.ts ──► hooks/useLostData.ts ─────────├─ components/lost/ThenNowCard ──► MiniMap ×2
-src/analysis/lostSource.ts   ──►  (removed-listing count)       ├─ components/lost/LostStoryPanel
-                                                                └─ components/lost/WhatCouldBeLostNext ──► AnalysisContext
-pages/DashboardPage.tsx ──► components/lost/LostDashboardSection ──► summarizeLost()
-```
-
-### New components
-| Component | Role |
-|---|---|
-| `pages/LostAmericaPage.tsx` | Page; owns `filters` and `selectedId` |
-| `components/lost/LostMap.tsx` | ArcGIS map: clustering, search, legend, state zoom, selection |
-| `components/lost/lostMapLayers.ts` | Layer factories + popup HTML (async image slot) |
-| `components/lost/LostFilters.tsx` | Search, state, decade, cause chips, NPS layer toggle |
-| `components/lost/LostPlaceList.tsx` | Keyboard‑accessible list beside the map |
-| `components/lost/ThenNowCard.tsx` + `MiniMap.tsx` | Then vs Now comparison |
-| `components/lost/LostStoryPanel.tsx` | Narrative panel and featured stories |
-| `components/lost/WhatCouldBeLostNext.tsx` | Transition into the risk workflow |
-| `components/lost/LostDashboardSection.tsx` | Dashboard metrics and charts |
-| `components/common/StoryArc.tsx` | "Past loss → Present conditions → Future risk" navigation (Home + Lost America) |
-
-### Data flow
-1. `LOST_PLACES` is bundled, so the page, story and dashboard work instantly and offline.
-2. `filterLostPlaces(places, filters)` applies state AND decade AND cause AND text filters; the filtered list is passed to the map (layer rebuilt, clusters recomputed) and the list.
-3. `summarizeLost()` produces totals, counts by state/decade/cause, oldest and most recent losses, median years standing and findings sentences.
-4. `countRemovedListings()` asks the NPS service for a count only (`returnCountOnly=true`); the map draws the same `STATUS = 'Removed'` features when the toggle is on.
-5. Selecting a place (map click or list) updates the popup and the Then vs Now card.
-
-### Then vs Now
-- **Then** — `fetchArchiveImage(title)` calls the Wikipedia REST *page summary* endpoint for the place's article and uses its lead image (resized to 640 px). Results are cached; disambiguation pages and failures return `null`, and the card falls back to the archive and nomination links. Every image shows a credit linking to its page, where date and license are recorded.
-- **Now** — two `MiniMap`s centered on the original coordinates: `streets-vector` (what the map shows there today) and `satellite` (Esri World Imagery).
-
-### Dashboard additions
-The Findings dashboard now ends with a **Lost America** section (respecting the dashboard's state filter): total sites lost, listings removed from the National Register (live, national view), oldest lost landmark, most recently lost landmark, median years standing, findings sentences, and three charts — **lost sites by state**, **by decade**, and **most common causes of loss** — built with the same `ChartFrame` / `BarChart` components (with table views) as the risk charts.
-
-### Limitations
-- The curated set is a documented sample, not a census of every lost place.
-- NPS `Removed` listings do not record *why* a property was removed; they are shown as context and not counted in the charts.
-- Historic photos depend on Wikipedia articles; some places have none, and a lead image may occasionally be a later photo — always check the credit link.
 
 ---
 
@@ -511,6 +409,3 @@ The Findings dashboard now ends with a **Lost America** section (respecting the 
 ✓ Light mode implemented
 ✓ Project folder structure provided
 ✓ Deployment instructions provided
-✓ Lost America page, clustered map, filters, Then vs Now, story panel and transition implemented
-✓ Lost America dashboard metrics added
-✓ Lost America architecture, data sources and data flow documented

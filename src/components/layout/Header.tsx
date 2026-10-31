@@ -7,7 +7,6 @@
  * Created:     2026-10-31
  * Modification Notes:
  *   - 2026-10-31  Initial component (Heritage at Risk v1.0)
- *   - 2026-10-31  Added "Lost America" navigation item
  *   - [YYYY-MM-DD] [Describe your change here]
  * ============================================================================
  */
@@ -17,7 +16,6 @@ import { useTheme } from "../../context/ThemeContext";
 /** Navigation entries: [route page, label]. */
 export const NAV_ITEMS: [string, string][] = [
   ["", "Home"],
-  ["lost", "Lost America"],
   ["map", "Interactive map"],
   ["explore", "State Explorer"],
   ["dashboard", "Findings"],

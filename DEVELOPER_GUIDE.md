@@ -15,7 +15,6 @@ This guide explains how the application works internally and how to extend it. I
 10. [Adding new hazard layers](#10-adding-new-hazard-layers)
 11. [Creating new dashboard metrics](#11-creating-new-dashboard-metrics)
 12. [Deployment guidance](#12-deployment-guidance)
-13. [Lost America](#13-lost-america)
 - [Coding conventions](#coding-conventions)
 
 ---
@@ -219,64 +218,6 @@ Because the State Explorer and Story also call `summarize()`, the metric is imme
    - **Any web server / S3:** upload `dist/`.
 5. Production checklist: set `VITE_ARCGIS_API_KEY` in the host's environment if you expect heavy traffic; verify each layer shows no "unavailable" flag; test `#/explore/FL` live analysis; check light and dark mode and a phone‑width window.
 6. **Expo day:** run `npm run preview` on the demo laptop, open `#/` (Story) and `#/dashboard`; keep a state you have analyzed (e.g., Florida) ready in the State Explorer.
-
-## 13. Lost America
-
-Lost America (`#/lost`) is a self‑contained feature that plugs into the existing shell. It adds no global state: the page owns its filters and selection, and it reads `AnalysisContext` only for the "What could be lost next?" bridge.
-
-### 13.1 Architecture
-
-| Layer | Files | Notes |
-|---|---|---|
-| Types | `types/lost.ts` | `LostPlace`, `LossCause`, `LostFilters`, `LostSummary`, `ArchiveImage` |
-| Config | `config/lostCauses.ts`, `config/palette.ts` (`LOSS_COLORS`), `styles/global.css` (`--loss-*`) | Cause labels, narrative verbs, marker shapes; Library of Congress / NPGallery / Wikipedia URL builders |
-| Data | `data/lostPlaces.ts` | 19 documented places with build/loss years, cause, significance, "today", archive, nomination, citation, `wikipediaTitle`, `featured` |
-| Analysis (pure) | `analysis/lostAnalysis.ts`, `analysis/archiveImages.ts`, `analysis/lostSource.ts` | Filters, summaries, narratives; image lookup; live removed count. No React/SDK imports; tested in `__tests__/lostAnalysis.test.ts` |
-| Hooks | `hooks/useLostData.ts` | `useArchiveImage(title)`, `useRemovedCount()` with abort/caching |
-| Map | `components/lost/LostMap.tsx`, `lostMapLayers.ts`, `MiniMap.tsx` | Same "create once, sync with effects" pattern as `HeritageMap` |
-| UI | `components/lost/*`, `components/common/StoryArc.tsx`, `pages/LostAmericaPage.tsx` | Filters, list, Then vs Now, story, transition, dashboard section |
-| Wiring | `App.tsx` (route `lost`, lazy), `Header.tsx` (nav item), `DashboardPage.tsx`, `HomePage.tsx`, `AboutDataPage.tsx`, `main.tsx` (CSS) | Small, additive edits |
-
-### 13.2 Data loading
-- **Curated places** are imported statically from `data/lostPlaces.ts`.
-- **Removed listings count:** `lostSource.countRemovedListings()` → `NRHP_POINTS_URL/query?where=STATUS='Removed'&returnCountOnly=true`. `useRemovedCount()` caches one promise per visit and shows "—" if the service is unreachable.
-- **Removed listings map layer:** `createRemovedListingsLayer()` is a `FeatureLayer` on the same URL with `definitionExpression = REMOVED_WHERE`, so the count and the dots always agree.
-
-### 13.3 Filtering workflow
-`filterLostPlaces(places, { state, decade, causes, query })` combines conditions with AND. The page:
-1. Keeps one `filters` object (`useState`), passed to `LostFilters` (controlled form).
-2. Computes `filtered` with `useMemo`; passes it to `LostMap` (which rebuilds its client‑side layer, so clusters recompute) and `LostPlaceList`.
-3. Computes option counts for the state dropdown and cause chips by re‑running the filter **without** that control's own filter, so options never misleadingly show zero for themselves.
-4. Zooms the map to the chosen state using `config/states.ts` centers.
-
-### 13.4 Popup generation
-`lostPopupContent(place)` returns an `HTMLElement` synchronously (all text fields + an empty, hidden image slot), so the popup opens instantly. It then calls `fetchArchiveImage()` and fills the slot if an image arrives. All values are HTML‑escaped. Cluster popups use the `{cluster_count}` field. Clicking a cluster never selects a place (`graphic.isAggregate`).
-
-### 13.5 Clustering
-`FeatureReductionCluster` with radius 56 px, sizes 20–44 px, and a centered count label (`Text($feature.cluster_count, '#,###')`). Clusters inherit the layer's `UniqueValueRenderer`, so each cluster takes the color/shape of its predominant cause.
-
-### 13.6 Image handling (Then vs Now)
-- `fetchArchiveImage(title)` → `https://en.wikipedia.org/api/rest_v1/page/summary/{title}`; uses `thumbnail.source` resized with `resizeWikimediaThumb(src, 640)`; skips `type: "disambiguation"`; caches by title; removes failed lookups from the cache so they can retry.
-- `ThenNowCard` shows the photo with a credit link, or a clear fallback pointing to the archive / nomination record. Never substitute a stock or unrelated image.
-- "Now" panels are two lazy‑loaded `MiniMap`s (`streets-vector`, `satellite`) that move their marker and view when the selected place changes.
-- To add a photo for a place, set `wikipediaTitle` to the exact English Wikipedia article title whose lead image is a pre‑loss photograph.
-
-### 13.7 Dashboard calculations
-`summarizeLost(places)` (one pass, `Map` counters):
-- `total`, `byState` (desc), `byDecade` (chronological; unknown last), `byCause` (desc, fixed cause order for ties)
-- `oldest` = minimum `yearBuilt`; `mostRecent` = maximum `yearLost`
-- `medianYearsStood` = median of `yearLost − yearBuilt` (median resists outliers)
-- `statements` from `lostStatements()` (skips empty categories)
-
-`LostDashboardSection` maps these to `StatTile`s and three `ChartFrame` + `BarChart`s, filtered by the dashboard's state selector. Years are passed as strings so `StatTile` does not format them with thousands separators.
-
-### 13.8 Adding a lost place
-1. Append an entry to `LOST_PLACES` (unique `id`, real coordinates of the original site, `yearBuilt`/`yearLost` or `builtLabel`, `cause`, `causeDetail`, `significance`, `today`, `archive`, optional `nomination` / `citation` / `wikipediaTitle`, `featured`).
-2. Cite a source for the loss facts in `citation` when they are not in the archive record.
-3. Run `npm test` — the data‑validity test checks ids, states, coordinates and date order.
-
-### 13.9 Adding a cause of loss
-Add the id to `LossCause` and `LOSS_CAUSES` (`types/lost.ts`), a `LOSS_CAUSE_CONFIG` entry (label, verb, marker shape), a color in `LOSS_COLORS` and `--loss-<id>` (both themes), and a `.loss-swatch--<id>` shape in `styles/lost.css`. Keep hues for natural forces and neutrals for human decisions, and re‑run the palette validator.
 
 ## Coding conventions
 

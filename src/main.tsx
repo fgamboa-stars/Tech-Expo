@@ -6,7 +6,6 @@
  * Created:     2026-10-31
  * Modification Notes:
  *   - 2026-10-31  Initial entry point (Heritage at Risk v1.0)
- *   - 2026-10-31  Import Lost America styles
  *   - [YYYY-MM-DD] [Describe your change here]
  * ============================================================================
  *
@@ -24,7 +23,6 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./styles/global.css";
 import "./styles/components.css";
-import "./styles/lost.css";
 
 const root = document.getElementById("root");
 if (!root) throw new Error("index.html is missing <div id=\"root\">");

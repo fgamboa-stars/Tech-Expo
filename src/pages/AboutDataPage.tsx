@@ -8,7 +8,6 @@
  * Created:     2026-10-31
  * Modification Notes:
  *   - 2026-10-31  Initial page (Heritage at Risk v1.0)
- *   - 2026-10-31  Added Lost America data sources
  *   - [YYYY-MM-DD] [Describe your change here]
  * ============================================================================
  */
@@ -23,10 +22,6 @@ const DATASETS: [string, string, string, string][] = [
   ["Sea Level Rise Viewer, +1 ft and +2 ft inundation", "NOAA Office for Coastal Management", "Would the landmark be below high tide with 1 or 2 feet of sea-level rise?", `${slrServiceUrl(1)} · ${slrServiceUrl(2)}`],
   ["Wildfire Hazard Potential 2023 (classified)", "USDA Forest Service, Fire Modeling Institute", "How hard would a wildfire here be to contain (very low → very high)?", WHP_URL],
   ["National Risk Index, census tracts", "FEMA", "Coastal-flood risk rating and community resilience for the surrounding tract.", NRI_TRACTS_URL],
-  ["Lost America: National Register listings with STATUS = 'Removed'", "National Park Service", "Where have listed places been removed from the Register (usually after demolition or destruction)?", NRHP_POINTS_URL],
-  ["Lost America: curated lost places", "This project (Library of Congress HABS, National Archives, NPS, news reports)", "When was each place built and lost, why, and what stands there now?", "src/data/lostPlaces.ts"],
-  ["Lost America: historic photos", "Wikipedia / Wikimedia Commons (lead image of each article)", "What did the place look like before it was lost?", "https://en.wikipedia.org/api/rest_v1/page/summary/{title}"],
-  ["Lost America: current imagery", "Esri World Imagery and World Street Map basemaps", "What occupies the site today?", "ArcGIS basemaps: satellite, streets-vector"],
 ];
 
 /** Renders the About the Data page. */

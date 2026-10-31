@@ -7,7 +7,6 @@
  * Created:     2026-10-31
  * Modification Notes:
  *   - 2026-10-31  Initial component (Heritage at Risk v1.0)
- *   - 2026-10-31  Added countLabel prop for Lost America ("3 lost")
  *   - [YYYY-MM-DD] [Describe your change here]
  * ============================================================================
  */
@@ -22,15 +21,13 @@ export interface StateSelectProps {
   /** Text for the "no state" option; omit to require a state. */
   allLabel?: string;
   label?: string;
-  /** Word after each count, e.g. "threatened" (default) or "lost". */
-  countLabel?: string;
 }
 
 /**
  * Renders a labeled <select> of all states.
  * @param props See StateSelectProps.
  */
-export default function StateSelect({ value, onChange, counts, allLabel, label = "State", countLabel = "threatened" }: StateSelectProps) {
+export default function StateSelect({ value, onChange, counts, allLabel, label = "State" }: StateSelectProps) {
   const id = useId();
   return (
     <div className="field">
@@ -47,7 +44,7 @@ export default function StateSelect({ value, onChange, counts, allLabel, label =
         {STATES.map((s) => (
           <option key={s.abbr} value={s.abbr}>
             {s.name}
-            {counts && counts[s.abbr] ? ` (${counts[s.abbr]} ${countLabel})` : ""}
+            {counts && counts[s.abbr] ? ` (${counts[s.abbr]} threatened)` : ""}
           </option>
         ))}
       </select>

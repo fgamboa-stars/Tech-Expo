@@ -1,0 +1,33 @@
+{
+  "name": "heritage-at-risk",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Heritage at Risk — which U.S. historic landmarks could be underwater or burned by 2050? A GIS storytelling app built with React and the ArcGIS Maps SDK for JavaScript.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "tsx --test src/analysis/__tests__/*.test.ts",
+    "analyze": "tsx scripts/run-analysis.ts",
+    "analyze:state": "tsx scripts/run-analysis.ts --state"
+  },
+  "dependencies": {
+    "@arcgis/core": "~4.34.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.0",
+    "vite": "^7.0.0"
+  }
+}

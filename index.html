@@ -1,0 +1,53 @@
+<!doctype html>
+<!--
+  ============================================================================
+  File:        index.html
+  Purpose:     Single HTML entry point. Vite injects the bundled app here.
+  Author:      [Your Name]
+  Created:     2026-10-31
+  Modification Notes:
+    - 2026-10-31  Initial page shell for Heritage at Risk v1.0
+    - [YYYY-MM-DD] [Describe your change here]
+  ============================================================================
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Which U.S. historic landmarks could be underwater or burned by 2050? An interactive GIS analysis of National Historic Landmarks against flood, sea-level-rise, and wildfire hazards." />
+    <meta name="theme-color" content="#eef1ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1a20" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Heritage at Risk — Historic landmarks and climate hazards to 2050</title>
+
+    <!-- Typefaces: Bitter (slab serif, the voice of park signage) for headlines,
+         Public Sans (the U.S. Web Design System face) for body and data. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;800&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+    />
+
+    <!-- ArcGIS widget theme. The app swaps light/dark at runtime (see ThemeContext). -->
+    <link id="esri-theme" rel="stylesheet" href="https://js.arcgis.com/4.34/esri/themes/light/main.css" />
+
+    <!-- Apply the saved theme before first paint to avoid a light/dark flash. -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("har-theme");
+          var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.dataset.theme = dark ? "dark" : "light";
+        } catch (e) {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <noscript>Heritage at Risk needs JavaScript to draw the map and run the analysis.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

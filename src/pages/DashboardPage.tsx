@@ -8,6 +8,7 @@
  * Created:     2026-10-31
  * Modification Notes:
  *   - 2026-10-31  Initial page (Heritage at Risk v1.0)
+ *   - 2026-10-31  Added the Lost America section (past losses) below the risk findings
  *   - [YYYY-MM-DD] [Describe your change here]
  * ============================================================================
  *
@@ -33,6 +34,7 @@ import { HAZARD_LAYERS } from "../config/layers";
 import { stateName } from "../config/states";
 import { filterByState, summarize } from "../analysis/findings";
 import { RISK_CLASSES } from "../types/analysis";
+import LostDashboardSection from "../components/lost/LostDashboardSection";
 
 /** Renders the Findings Dashboard. */
 export default function DashboardPage() {
@@ -114,6 +116,9 @@ export default function DashboardPage() {
         <p className="muted">Ranked by risk score. Open a row to see the evidence for each hazard.</p>
         <LandmarkList items={s.top10} pageSize={10} />
       </section>
+
+      {/* Past losses, filtered by the same state selector as the risk findings above. */}
+      <LostDashboardSection state={state} />
     </div>
   );
 }

@@ -7,6 +7,7 @@
  * Created:     2026-10-31
  * Modification Notes:
  *   - 2026-10-31  Initial shell (Heritage at Risk v1.0)
+ *   - 2026-10-31  Added the Lost America route (#/lost), lazy-loaded
  *   - [YYYY-MM-DD] [Describe your change here]
  * ============================================================================
  *
@@ -29,12 +30,16 @@ import AboutProjectPage from "./pages/AboutProjectPage";
 
 const MapPage = lazy(() => import("./pages/MapPage"));
 const StateExplorerPage = lazy(() => import("./pages/StateExplorerPage"));
+const LostAmericaPage = lazy(() => import("./pages/LostAmericaPage"));
 
 /** Chooses the page component for the current route. */
 function Router() {
   const { route, navigate } = useHashRoute();
   let page;
   switch (route.page) {
+    case "lost":
+      page = <LostAmericaPage />;
+      break;
     case "map":
       page = <MapPage />;
       break;

@@ -8,6 +8,7 @@
  * Created:     2026-10-31
  * Modification Notes:
  *   - 2026-10-31  Initial page (Heritage at Risk v1.0)
+ *   - 2026-10-31  Added the three-part story arc (Lost America → present → future risk)
  *   - [YYYY-MM-DD] [Describe your change here]
  * ============================================================================
  *
@@ -24,6 +25,7 @@ import { isFireThreatened, isWaterThreatened, rankByVulnerability } from "../ana
 import FindingsList from "../components/findings/FindingsList";
 import { HazardChips, RiskBadge } from "../components/landmarks/RiskBadge";
 import DatasetBanner from "../components/common/DatasetBanner";
+import StoryArc from "../components/common/StoryArc";
 import type { RiskAssessment } from "../types/analysis";
 
 /**
@@ -140,6 +142,10 @@ export default function HomePage() {
         <TideGauge underwater={summary.underwater} burned={summary.burned} />
       </section>
 
+      <div className="home-arc">
+        <StoryArc />
+      </div>
+
       <article className="story">
         <section className="story__section">
           <h2>Places are how a nation remembers</h2>
@@ -158,6 +164,9 @@ export default function HomePage() {
             are gone. Preservation works best before disaster — documenting, reinforcing and planning — yet most hazard planning
             focuses on homes and infrastructure. Cultural sites are often left out of the data entirely. This project puts them
             back in.
+          </p>
+          <p>
+            <a href="#/lost">See what America has already lost</a>, from Penn Station to Lahaina's Wo Hing Temple.
           </p>
         </section>
 
